@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <iosfwd>
 
 #include <boost/optional.hpp>
 
@@ -12,38 +14,53 @@ namespace impl {
 class Argument
 {
     public:
-        Argument(const std::shared_ptr<std::vector<std::string>>& arguments, const std::string& shortForm, const std::string& longForm);
+        Argument(std::string shortForm, std::string longForm)
+            : isMandatory_(false)
+            , isValueless_(false)
+            , helpText_()
+            , shortForm_(std::move(shortForm))
+            , longForm_(std::move(longForm))
+            , value_()
+        {}
 
         void mandatory(bool isMandatory) { isMandatory_ = isMandatory; }
-        //void multiple(bool isMultiple) { isMultiple_ = isMultiple; }
         void help(const std::string& text) { helpText_ = text; }
-        void valueless(bool isValueless) { isValueless_ = isValueless;}
+        void valueless(bool isValueless) { isValueless_ = isValueless; }
 
-        boost::optional<std::string> value();
+        const boost::optional<std::string>& value() const { return value_; }
+
+        void validate() const;
+
+        friend std::ostream& operator<<(std::ostream& os, const Argument& arg);
 
     private:
-        boost::optional<std::string> optionName(const std::string& arg);
-
         bool isMandatory_;
-        bool isMultiple_;
         bool isValueless_;
         std::string helpText_;
 
-        std::shared_ptr<std::vector<std::string>> arguments_;
         std::string shortForm_;
         std::string longForm_;
+
+        boost::optional<std::string> value_;
 };
 
 class Options
 {
     public:
-        Options(int argc, char** argv);
+        Options() = default;
 
-        std::unique_ptr<Argument> getArgument(const std::string& shortForm, const std::string& longForm);
+        void parse(int argc, char** argv);
+
+        std::shared_ptr<Argument> getArgument(const std::string& shortForm, const std::string& longForm);
+
+        friend std::ostream& operator<<(std::ostream& os, const Options& arg);
 
     private:
-        std::shared_ptr<std::vector<std::string>> arguments_;
+        std::unordered_map<std::string, std::shared_ptr<Argument>> arguments_;
 };
+
+std::ostream& operator<<(std::ostream& os, const Argument& arg);
+std::ostream& operator<<(std::ostream& os, const Options& arg);
 
 } // namespace impl
 } // namespace oxcd8o

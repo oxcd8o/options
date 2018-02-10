@@ -27,10 +27,9 @@ class Error: public std::exception
         std::string what_;
 };
 
-class ValueError: public Error
-{
-    public:
-        ValueError(): Error("ValueError: ") {}
-};
+#define DEFINE_ERROR(name) class name: public Error { public: name(): Error(#name ": ") {} };
+DEFINE_ERROR(ValueError)
+DEFINE_ERROR(MandatoryError)
+#undef DEFINE_ERROR
 
 } // namespace oxcd8o

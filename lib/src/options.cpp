@@ -3,11 +3,6 @@
 
 namespace oxcd8o {
 
-Argument::Argument(std::unique_ptr<impl::Argument>&& data)
-    : impl_(std::move(data))
-{
-}
-
 Argument&& Argument::mandatory(bool isMandatory)
 {
     impl_->mandatory(isMandatory);
@@ -20,12 +15,6 @@ Argument&& Argument::help(const std::string& text)
     return std::forward<Argument>(*this);
 }
 
-/*Argument&& Argument::multiple(bool isMultiple)
-{
-    impl_->multiple(isMultiple);
-    return std::forward<Argument>(*this);
-}*/
-
 Argument&& Argument::valueless(bool isValueless)
 {
     impl_->valueless(isValueless);
@@ -37,19 +26,30 @@ boost::optional<std::string> Argument::retrieveRawValue() const
     return impl_->value();
 }
 
-Options::Options(int argc, char** argv)
-    : impl_(new impl::Options(argc, argv))
+Options::Options()
+    : impl_(new impl::Options())
+{}
+
+void Options::parse(int argc, char** argv)
 {
+    impl_->parse(argc, argv);
 }
 
-Options::~Options()
-{
-    delete impl_;
-}
-
-Argument Options::getArgument(const std::string& shortForm, const std::string& longForm) const
+Argument Options::argument(const std::string& shortForm, const std::string& longForm) const
 {
     return Argument(impl_->getArgument(shortForm, longForm));
+}
+
+std::ostream& operator<<(std::ostream& os, const Argument& arg)
+{
+    os << *arg.impl_;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Options& op)
+{
+    os << *op.impl_;
+    return os;
 }
 
 } //namespace oxcd8o

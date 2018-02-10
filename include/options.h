@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <iosfwd>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
@@ -17,36 +18,43 @@ namespace impl {
 class Argument
 {
     public:
-        Argument(std::unique_ptr<impl::Argument>&& data);
+        Argument(std::shared_ptr<impl::Argument> data)
+            : impl_(std::move(data))
+        {}
 
         Argument&& mandatory(bool isMandatory = true);
         Argument&& help(const std::string& text);
-        //Argument&& multiple(bool isMultiple = true);
         Argument&& valueless(bool isValueless = true);
+        //template <class T>
+        //Argument&& default(const T& defaultValue);
 
         template <class T>
-        T as(const T& defaultValue) const
-        {
-            boost::optional<std::string> value = retrieveRawValue();
-            return (value ? boost::lexical_cast<T>(*value) : defaultValue);
-        }
+        T as() const { return boost::lexical_cast<T>(retrieveRawValue()); }
+
+        friend std::ostream& operator<<(std::ostream& os, const Argument& arg);
 
     private:
         boost::optional<std::string> retrieveRawValue() const;
 
-        std::unique_ptr<impl::Argument> impl_;
+        std::shared_ptr<impl::Argument> impl_;
 };
 
 class Options
 {
     public:
-        Options(int argc, char** argv);
-        ~Options();
+        Options();
 
-        Argument getArgument(const std::string& shortForm, const std::string& longForm) const;
+        void parse(int argc, char** argv);
+
+        Argument argument(const std::string& shortForm, const std::string& longForm) const;
+
+        friend std::ostream& operator<<(std::ostream& os, const Options& arg);
 
     private:
-        impl::Options* impl_;
+        std::shared_ptr<impl::Options> impl_;
 };
+
+std::ostream& operator<<(std::ostream& os, const Argument& arg);
+std::ostream& operator<<(std::ostream& os, const Options& arg);
 
 } //namespace oxcd8o
