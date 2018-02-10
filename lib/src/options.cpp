@@ -21,9 +21,9 @@ Argument&& Argument::valueless(bool isValueless)
     return std::forward<Argument>(*this);
 }
 
-boost::optional<std::string> Argument::retrieveRawValue() const
+const std::string& Argument::retrieveRawValue() const
 {
-    return impl_->value();
+    return *impl_->value();
 }
 
 Options::Options()

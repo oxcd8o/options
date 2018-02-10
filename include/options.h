@@ -34,7 +34,7 @@ class Argument
         friend std::ostream& operator<<(std::ostream& os, const Argument& arg);
 
     private:
-        boost::optional<std::string> retrieveRawValue() const;
+        const std::string& retrieveRawValue() const;
 
         std::shared_ptr<impl::Argument> impl_;
 };

@@ -21,6 +21,10 @@ void Options::parse(int argc, char** argv)
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }
+
+    for (const auto& arg : arguments_) {
+        arg.second->validate();
+    }
 }
 
 std::shared_ptr<Argument> Options::getArgument(const std::string& shortForm, const std::string& longForm)

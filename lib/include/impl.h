@@ -26,7 +26,11 @@ class Argument
         void mandatory(bool isMandatory) { isMandatory_ = isMandatory; }
         void help(const std::string& text) { helpText_ = text; }
         void valueless(bool isValueless) { isValueless_ = isValueless; }
+        void value(const boost::optional<std::string>& newValue) { value_ = newValue; }
 
+        bool mandatory() const { return isMandatory_; }
+        const std::string& help() const { return helpText_; }
+        bool valueless() const { return isValueless_; }
         const boost::optional<std::string>& value() const { return value_; }
 
         void validate() const;
