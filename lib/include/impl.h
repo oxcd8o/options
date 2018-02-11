@@ -23,12 +23,12 @@ class Argument
             , value_()
         {}
 
-        void mandatory(bool isMandatory) { isMandatory_ = isMandatory; }
+        void mandatory() { isMandatory_ = true; }
         void help(const std::string& text) { helpText_ = text; }
-        void valueless(bool isValueless)
+        void valueless()
         {
-            isValueless_ = isValueless;
-            value_ = "0";
+            isValueless_ = true;
+            defaultValue_ = "0";
             metaVariable_.reset();
         }
         void metavar(const std::string& metaVariable) { metaVariable_ = metaVariable; }
@@ -57,8 +57,8 @@ class Argument
         boost::optional<std::string> metaVariable_;
 
         std::string name_;
-        boost::optional<std::string> defaultValue_;
 
+        boost::optional<std::string> defaultValue_;
         boost::optional<std::string> value_;
 };
 
@@ -66,10 +66,10 @@ class Options
 {
     public:
         Options()
-            : unknownPermitted_(false)
+            : allowUnknown_(false)
         {}
 
-        void allowUnknown(bool unknownPermitted) { unknownPermitted_ = unknownPermitted; }
+        void allowUnknown() { allowUnknown_ = true; }
 
         void parse(const std::vector<std::string>& argv);
 
@@ -78,7 +78,7 @@ class Options
         std::string getHelp() const;
 
     private:
-        bool unknownPermitted_;
+        bool allowUnknown_;
         std::unordered_map<std::string, std::shared_ptr<Argument>> arguments_;
 };
 

@@ -44,7 +44,7 @@ void Options::parse(const std::vector<std::string>& argv)
                 }
                 argument->value(*it);
             }
-        } else if (!unknownPermitted_) {
+        } else if (!allowUnknown_) {
             throw UnknownArgumentError() << *it << " is unknown argument.";
         }
     }

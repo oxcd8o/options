@@ -4,9 +4,9 @@
 
 namespace oxcd8o {
 
-Argument&& Argument::mandatory(bool isMandatory)
+Argument&& Argument::mandatory()
 {
-    impl_->mandatory(isMandatory);
+    impl_->mandatory();
     return std::forward<Argument>(*this);
 }
 
@@ -16,9 +16,9 @@ Argument&& Argument::help(const std::string& text)
     return std::forward<Argument>(*this);
 }
 
-Argument&& Argument::valueless(bool isValueless)
+Argument&& Argument::valueless()
 {
-    impl_->valueless(isValueless);
+    impl_->valueless();
     return std::forward<Argument>(*this);
 }
 
@@ -50,9 +50,9 @@ Options::Options()
     : impl_(new impl::Options())
 {}
 
-Options&& Options::allowUnknown(bool unknownPermitted)
+Options&& Options::allowUnknown()
 {
-    impl_->allowUnknown(unknownPermitted);
+    impl_->allowUnknown();
     return std::forward<Options>(*this);
 }
 
