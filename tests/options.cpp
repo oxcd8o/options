@@ -12,11 +12,11 @@ int main(int argc, char** argv)
     }
 
     oxcd8o::Options op;
-    auto config = op.argument("-c", "--config").mandatory().help("Path to configuration file.");
+    auto config = op.argument("-c", "--config").mandatory().help("Path to configuration file.").metavar("<path>");
     auto log = op.argument("-l", "--log").help("Path to log file.");
     auto flag = op.argument("-f", "--flag").valueless().help("Some unknown flag.");
 
-    std::cout << op;
+    std::cout << op.getHelp();
 
     op.parse(argc, argv);
 

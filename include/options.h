@@ -2,8 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <type_traits>
-#include <iosfwd>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
@@ -25,16 +23,23 @@ class Argument
         Argument&& mandatory(bool isMandatory = true);
         Argument&& help(const std::string& text);
         Argument&& valueless(bool isValueless = true);
-        //template <class T>
-        //Argument&& default(const T& defaultValue);
+        Argument&& metavar(const std::string& metaVariable);
+
+        // Not exactly the most elegant solution, but saves lots of coding because do
+        // not require separate classes for different types of values. And still allows
+        // to hide impl from end user completely.
+        template <class T>
+        Argument&& defaultValue(const T& defaultValue)
+        {
+            setDefault(boost::lexical_cast<std::string>(defaultValue));
+        }
 
         template <class T>
         T as() const { return boost::lexical_cast<T>(retrieveRawValue()); }
 
-        friend std::ostream& operator<<(std::ostream& os, const Argument& arg);
-
     private:
         const std::string& retrieveRawValue() const;
+        void setDefault(const std::string& value);
 
         std::shared_ptr<impl::Argument> impl_;
 };
@@ -45,16 +50,14 @@ class Options
         Options();
 
         void parse(int argc, char** argv);
+        void parse(const std::vector<std::string>& argv);
 
         Argument argument(const std::string& shortForm, const std::string& longForm) const;
 
-        friend std::ostream& operator<<(std::ostream& os, const Options& arg);
+        std::string getHelp() const;
 
     private:
         std::shared_ptr<impl::Options> impl_;
 };
-
-std::ostream& operator<<(std::ostream& os, const Argument& arg);
-std::ostream& operator<<(std::ostream& os, const Options& arg);
 
 } //namespace oxcd8o

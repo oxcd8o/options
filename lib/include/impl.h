@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <iosfwd>
 
 #include <boost/optional.hpp>
 
@@ -14,36 +13,40 @@ namespace impl {
 class Argument
 {
     public:
-        Argument(std::string shortForm, std::string longForm)
+        Argument(const std::string& shortForm, const std::string& longForm)
             : isMandatory_(false)
             , isValueless_(false)
             , helpText_()
-            , shortForm_(std::move(shortForm))
-            , longForm_(std::move(longForm))
+            , metaVariable_("<value>")
+            , name_(shortForm + "/" + longForm)
             , value_()
         {}
 
         void mandatory(bool isMandatory) { isMandatory_ = isMandatory; }
         void help(const std::string& text) { helpText_ = text; }
         void valueless(bool isValueless) { isValueless_ = isValueless; }
-        void value(const boost::optional<std::string>& newValue) { value_ = newValue; }
+        void metavar(const std::string& metaVariable) { metaVariable_ = metaVariable; }
+        void value(const std::string& newValue) { value_ = newValue; }
 
         bool mandatory() const { return isMandatory_; }
         const std::string& help() const { return helpText_; }
         bool valueless() const { return isValueless_; }
+        const std::string& metavar() const { return metaVariable_; }
         const boost::optional<std::string>& value() const { return value_; }
+        const std::string& name() const { return name_; }
 
         void validate() const;
 
-        friend std::ostream& operator<<(std::ostream& os, const Argument& arg);
+        std::string formatHelp();
+        std::string formatName() const;
 
     private:
         bool isMandatory_;
         bool isValueless_;
         std::string helpText_;
+        std::string metaVariable_;
 
-        std::string shortForm_;
-        std::string longForm_;
+        std::string name_;
 
         boost::optional<std::string> value_;
 };
@@ -53,18 +56,15 @@ class Options
     public:
         Options() = default;
 
-        void parse(int argc, char** argv);
+        void parse(const std::vector<std::string>& argv);
 
         std::shared_ptr<Argument> getArgument(const std::string& shortForm, const std::string& longForm);
 
-        friend std::ostream& operator<<(std::ostream& os, const Options& arg);
+        std::string getHelp() const;
 
     private:
         std::unordered_map<std::string, std::shared_ptr<Argument>> arguments_;
 };
-
-std::ostream& operator<<(std::ostream& os, const Argument& arg);
-std::ostream& operator<<(std::ostream& os, const Options& arg);
 
 } // namespace impl
 } // namespace oxcd8o

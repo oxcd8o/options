@@ -1,27 +1,30 @@
 #include "lib/include/impl.h"
 #include "include/error.h"
 
-#include <ostream>
+#include <sstream>
+#include <map>
 
 namespace oxcd8o {
 namespace impl {
 
 void Argument::validate() const
 {
-    auto argumentName = [this] { return shortForm_ + "/" + longForm_; };
-
     if (isMandatory_ && !value_) {
-        throw MandatoryError() << "Argument " << argumentName() << " is mandatory.";
+        throw MandatoryError() << "Argument " << name_ << " is mandatory.";
     }
 }
 
-void Options::parse(int argc, char** argv)
+std::string Argument::formatHelp()
 {
-    std::vector<std::string> args;
-    for (int i = 1; i < argc; ++i) {
-        args.emplace_back(argv[i]);
-    }
+    std::stringstream ss;
+    ss << "  " << name_ << (isValueless_ ? "" : " " + metaVariable_) << std::endl
+       << "        ("  << (isMandatory_ ? "mandatory" : "optional") << ")" << std::endl
+       << "    " << helpText_ << std::endl;
+    return ss.str();
+}
 
+void Options::parse(const std::vector<std::string>& argv)
+{
     for (const auto& arg : arguments_) {
         arg.second->validate();
     }
@@ -36,22 +39,21 @@ std::shared_ptr<Argument> Options::getArgument(const std::string& shortForm, con
     return newArgument;
 }
 
-std::ostream& operator<<(std::ostream& os, const Argument& arg)
+std::string Options::getHelp() const
 {
-    os << arg.shortForm_ << "/" << arg.longForm_
-       << ", " << (arg.isMandatory_ ? "mandatory" : "optional")
-       << ", " << (arg.isValueless_ ? "valueless" : "valueful")
-       << ", " << "<" << arg.helpText_ << ">"
-       ;
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Options& op)
-{
-    for (const auto& elem : op.arguments_) {
-        os << elem.first << ": " << *elem.second << std::endl;
+    std::map<std::string, std::shared_ptr<Argument>> uniqueArguments;
+    for (const auto& elem : arguments_) {
+        const auto& name = elem.second->name();
+        if (!uniqueArguments.count(name)) {
+            uniqueArguments[name] = elem.second;
+        }
     }
-    return os;
+
+    std::stringstream ss;
+    for (const auto& elem : uniqueArguments) {
+        ss << elem.second->formatHelp() << std::endl;
+    }
+    return ss.str();
 }
 
 } // namespace impl

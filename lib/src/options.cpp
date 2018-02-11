@@ -21,9 +21,20 @@ Argument&& Argument::valueless(bool isValueless)
     return std::forward<Argument>(*this);
 }
 
+Argument&& Argument::metavar(const std::string& metaVariable)
+{
+    impl_->metavar(metaVariable);
+    return std::forward<Argument>(*this);
+}
+
 const std::string& Argument::retrieveRawValue() const
 {
     return *impl_->value();
+}
+
+void Argument::setDefault(const std::string& value)
+{
+    impl_->value(value);
 }
 
 Options::Options()
@@ -32,7 +43,16 @@ Options::Options()
 
 void Options::parse(int argc, char** argv)
 {
-    impl_->parse(argc, argv);
+    std::vector<std::string> args;
+    for (int i = 1; i < argc; ++i) {
+        args.emplace_back(argv[i]);
+    }
+    parse(args);
+}
+
+void Options::parse(const std::vector<std::string>& argv)
+{
+    impl_->parse(argv);
 }
 
 Argument Options::argument(const std::string& shortForm, const std::string& longForm) const
@@ -40,16 +60,9 @@ Argument Options::argument(const std::string& shortForm, const std::string& long
     return Argument(impl_->getArgument(shortForm, longForm));
 }
 
-std::ostream& operator<<(std::ostream& os, const Argument& arg)
+std::string Options::getHelp() const
 {
-    os << *arg.impl_;
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Options& op)
-{
-    os << *op.impl_;
-    return os;
+    return impl_->getHelp();
 }
 
 } //namespace oxcd8o
