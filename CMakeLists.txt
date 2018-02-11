@@ -8,9 +8,18 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
-add_library(options lib/src/options.cpp lib/src/impl.cpp)
-target_include_directories(options PRIVATE . /usr/local/opt/boost@1.60/include)
+include_directories(
+    ./
+    /usr/local/opt/boost@1.60/include
+)
 
-add_executable(options_test tests/options.cpp)
-target_include_directories(options_test PRIVATE . /usr/local/opt/boost@1.60/include)
-target_link_libraries(options_test options)
+link_directories(
+    out
+)
+
+enable_testing()
+
+add_subdirectory(
+    tests
+    lib
+)

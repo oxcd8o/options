@@ -16,14 +16,14 @@ void Argument::validate() const
     } else if (isValueless_ && defaultValue_) {
         throw SanityError() << "Argument " << name_ << " is both valueless (defaulted to false) and has explicit default value.";
     } else if (isValueless_ && metaVariable_) {
-        throw SanityError() << "Argument " << name_ << " is both valueless and has explicily specified meta variable."
+        throw SanityError() << "Argument " << name_ << " is both valueless and has explicily specified meta variable.";
     }
 }
 
 std::string Argument::formatHelp()
 {
     std::stringstream ss;
-    ss << "  " << name_ << (isValueless_ ? "" : " " + metaVariable_) << std::endl
+    ss << "  " << name_ << (isValueless_ ? "" : " " + *metaVariable_) << std::endl
        << "        ("  << (isMandatory_ ? "mandatory" : "optional") << ")" << std::endl
        << "    " << helpText_ << std::endl;
     return ss.str();
