@@ -11,6 +11,12 @@ void Argument::validate() const
 {
     if (isMandatory_ && !value_) {
         throw MandatoryError() << "Argument " << name_ << " is mandatory.";
+    } else if (isMandatory_ && defaultValue_) {
+        throw SanityError() << "Argument " << name_ << " is both mandatory and has default value.";
+    } else if (isValueless_ && defaultValue_) {
+        throw SanityError() << "Argument " << name_ << " is both valueless (defaulted to false) and has explicit default value.";
+    } else if (isValueless_ && metaVariable_) {
+        throw SanityError() << "Argument " << name_ << " is both valueless and has explicily specified meta variable."
     }
 }
 
@@ -25,6 +31,24 @@ std::string Argument::formatHelp()
 
 void Options::parse(const std::vector<std::string>& argv)
 {
+    auto it = argv.begin();
+    for (; it != argv.end(); ++it) {
+        if (arguments_.count(*it)) {
+            auto& argument = arguments_[*it];
+            if (argument->valueless()) {
+                argument->value("1");
+            } else {
+                ++it;
+                if (it == argv.end()) {
+                    throw ValueError() << *(it - 1) << " should have explicit value.";
+                }
+                argument->value(*it);
+            }
+        } else if (!unknownPermitted_) {
+            throw UnknownArgumentError() << *it << " is unknown argument.";
+        }
+    }
+
     for (const auto& arg : arguments_) {
         arg.second->validate();
     }

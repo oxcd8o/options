@@ -32,7 +32,10 @@ class Argument
         Argument&& defaultValue(const T& defaultValue)
         {
             setDefault(boost::lexical_cast<std::string>(defaultValue));
+            return std::forward<Argument>(*this);
         }
+
+        operator bool() const;
 
         template <class T>
         T as() const { return boost::lexical_cast<T>(retrieveRawValue()); }
@@ -48,6 +51,8 @@ class Options
 {
     public:
         Options();
+
+        Options&& allowUnknown(bool unknownPermitted = true);
 
         void parse(int argc, char** argv);
         void parse(const std::vector<std::string>& argv);

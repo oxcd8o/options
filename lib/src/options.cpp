@@ -1,5 +1,6 @@
 #include "lib/include/impl.h"
 #include "include/options.h"
+#include "include/error.h"
 
 namespace oxcd8o {
 
@@ -29,17 +30,31 @@ Argument&& Argument::metavar(const std::string& metaVariable)
 
 const std::string& Argument::retrieveRawValue() const
 {
+    if (!*this) {
+        throw UninitializedError() << impl_->name() << " is uninitialized.";
+    }
     return *impl_->value();
+}
+
+Argument::operator bool() const
+{
+    return impl_->operator bool();
 }
 
 void Argument::setDefault(const std::string& value)
 {
-    impl_->value(value);
+    impl_->defaultValue(value);
 }
 
 Options::Options()
     : impl_(new impl::Options())
 {}
+
+Options&& Options::allowUnknown(bool unknownPermitted)
+{
+    impl_->allowUnknown(unknownPermitted);
+    return std::forward<Options>(*this);
+}
 
 void Options::parse(int argc, char** argv)
 {
