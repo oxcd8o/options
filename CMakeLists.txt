@@ -9,7 +9,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
 include_directories(
-    ./
+    .
     /usr/local/opt/boost@1.60/include
 )
 
@@ -19,7 +19,5 @@ link_directories(
 
 enable_testing()
 
-add_subdirectory(
-    tests
-    lib
-)
+add_subdirectory(lib)
+add_subdirectory(tests)

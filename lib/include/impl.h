@@ -7,6 +7,9 @@
 
 #include <boost/optional.hpp>
 
+const std::string TRUE  = "1";
+const std::string FALSE = "0";
+
 namespace oxcd8o {
 namespace impl {
 
@@ -28,16 +31,16 @@ class Argument
         void valueless()
         {
             isValueless_ = true;
-            defaultValue_ = "0";
+            defaultValue_ = FALSE;
             metaVariable_.reset();
         }
         void metavar(const std::string& metaVariable) { metaVariable_ = metaVariable; }
         void value(const std::string& newValue) { value_ = newValue; }
         void defaultValue(const std::string& value) { defaultValue_ = value; }
 
-        bool mandatory() const { return isMandatory_; }
+        bool isMandatory() const { return isMandatory_; }
         const std::string& help() const { return helpText_; }
-        bool valueless() const { return isValueless_; }
+        bool isValueless() const { return isValueless_; }
         const std::string& metavar() const { return *metaVariable_; }
         const boost::optional<std::string>& value() const { return (value_ ? value_ : defaultValue_); }
         const boost::optional<std::string>& defaultValue() const { return defaultValue_; }

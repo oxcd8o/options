@@ -35,8 +35,8 @@ void Options::parse(const std::vector<std::string>& argv)
     for (; it != argv.end(); ++it) {
         if (arguments_.count(*it)) {
             auto& argument = arguments_[*it];
-            if (argument->valueless()) {
-                argument->value("1");
+            if (argument->isValueless()) {
+                argument->value(TRUE);
             } else {
                 ++it;
                 if (it == argv.end()) {
